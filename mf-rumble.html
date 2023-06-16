@@ -6,53 +6,70 @@
 
   <script type="text/javascript">
     // This function will process the input data and output the result
-    function processData() {
-      // Get the input textarea element by its id
-      var input = document.getElementById("input");
-      // Get the value of the input textarea
-      var data = input.value;
-      // Split the data by newline characters into an array of lines
-      var lines = data.split("\n");
-      // Create an empty set to store the processed lines
-      var processedLines = new Set();
-      // Loop through each line in the array
-      for (var i = 0; i < lines.length; i++) {
-        // Strip any whitespace from the line
-        var line = lines[i].trim();
-        // Check if the line contains a number sign followed by four digits using a regular expression
-        var match = line.match(/#\d{4}/);
-        // If there is a match, extract the number sign and the digits
-        if (match) {
-          var number = match[0];
-          // Get the previous line from the array
-          var prevLine = lines[i-1].trim();
-          // Skip if the previous line starts with "Rumble Royale"
-          if (prevLine.startsWith("Rumble Royale")) {
-            continue;
-          }
-          // Concatenate the previous line and the number
-          var newLine = prevLine + number;
-          // Add the new line to the set, which will remove any duplicates
-          processedLines.add(newLine);
-        }
-      }
-      // Sort the processed lines by converting them to lowercase first
-      processedLines = new Set([...processedLines].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())));
-      // Create an empty string to store the output
-      var output = "";
-      // Loop through the processed lines and append them to the output string with newline characters
-      for (var line of processedLines) {
-        output += line + "\n";
-      }
-      // Remove any blank lines from the output using replace method with a regular expression
-      output = output.replace(/^\s+|\s+$/g, "").replace(/\n\s*\n/g, "\n");
-      // Get the first output textarea element by its id
-      var result1 = document.getElementById("output1");
-      // Set the value of the first output textarea to the output string
-      result1.value = output;
+	function processData() {
+	  // Get the input textarea element by its id
+	  var input = document.getElementById("input");
+	  // Get the value of the input textarea
+	  var data = input.value;
+	  // Split the data by newline characters into an array of lines
+	  var lines = data.split("\n");
+
+	  // Copy all lines to processedLines
+	  var processedLines = [...lines];
+
+	  // 1. If the first line is Rumble Royale, delete that line and the next 2 lines.
+	  if (processedLines[0] === "Rumble Royale") {
+		processedLines.splice(0, 3);
+	  }
+
+	  // 2. If the line contains "BOT", delete that line.
+	  processedLines = processedLines.filter(line => !line.includes("BOT"));
+
+	  // 3. and 4. Delete lines and remove newline characters as specified.
+	  // Create an array to store intermediate results
+	  var intermediateLines = [];
+	  var lineIdx = 0;
+	  var lineCount = processedLines.length;
+
+	  while (lineIdx < lineCount) {
+		// Check if current line does not match the pattern
+		if (!processedLines[lineIdx].match(/#\d{4}/) && lineIdx + 1 < lineCount
+		  && !processedLines[lineIdx + 1].match(/#\d{4}/)) {
+			// Delete the first of two lines that do not match the pattern
+			lineIdx++;
+		}
+
+		// Append the current line without newline character if the next line matches the pattern
+		if (lineIdx + 1 < lineCount && processedLines[lineIdx + 1].match(/#\d{4}/)) {
+		  intermediateLines.push(processedLines[lineIdx] + processedLines[lineIdx + 1]);
+		  lineIdx += 2;
+		} else {
+		  // Otherwise, append the current line with a newline character
+		  intermediateLines.push(processedLines[lineIdx]);
+		  lineIdx++;
+		}
+	  }
+
+	  processedLines = intermediateLines;
+
+	  // Sort the processed lines by converting them to lowercase first
+	  processedLines = new Set([...processedLines].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())));
+	  // Create an empty string to store the output
+	  var output = "";
+	  // Loop through the processed lines and append them to the output string with newline characters
+	  for (var line of processedLines) {
+		output += line + "\n";
+	  }
+	  // Remove any blank lines from the output using replace method with a regular expression
+	  output = output.replace(/^\s+|\s+$/g, "").replace(/\n\s*\n/g, "\n");
+	  // Get the first output textarea element by its id
+	  var result1 = document.getElementById("output1");
+	  // Set the value of the first output textarea to the output string
+	  result1.value = output;
 	  processData2()
 	}
-	
+
+
 	function processData2() {
       // Get the count paragraph element by its id
       var count = document.getElementById("count");
