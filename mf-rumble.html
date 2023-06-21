@@ -17,9 +17,12 @@
 	  // Copy all lines to processedLines
 	  var processedLines = [...lines];
 
-	  // 1. If the first line is Rumble Royale, delete that line and the next 2 lines.
-	  if (processedLines[0] === "Rumble Royale") {
-		processedLines.splice(0, 3);
+	  // 1. If any line is Rumble Royale, delete that line and the next 2 lines.
+	  for (var i = 0; i < processedLines.length; i++) {
+		if (processedLines[i] === "Rumble Royale" && i + 2 < processedLines.length) {
+		  processedLines.splice(i, 3);
+		  i -= 1; // Decrement counter so as not to skip processing a line after removing elements.
+		}
 	  }
 
 	  // 2. If the line contains "BOT", delete that line.
